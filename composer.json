@@ -1,0 +1,21 @@
+{
+  "name": "septemberdigital/wordpress-meilisearch",
+  "type": "wordpress-plugin",
+  "authors": [
+    {
+      "name": "September Digital",
+      "email": "development@september.digital"
+    }
+  ],
+  "require": {
+    "php": ">=7.0",
+    "meilisearch/meilisearch-php": "^0.18.3",
+    "guzzlehttp/guzzle": "^7.3",
+    "http-interop/http-factory-guzzle": "^1.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "WordpressMeilisearchPlugin\\": "includes/classes/"
+    }
+  }
+}
