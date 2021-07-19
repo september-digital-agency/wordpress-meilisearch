@@ -1,12 +1,6 @@
 <div class="wrap">
 	<h1>Search<span>Developer-friendly plugin to add Meilisearch and indexing to Wordpress.</span></h1>
 
-	<div class="box--credit">
-		<small>
-			<pre>This plugin is maintained by <a href="https://september.digital" target="_blank">september.digital</a>. Please file issues or requests at github.</pre>
-		</small>
-	</div>
-
 	<h2>Status</h2>
 
 	<div class="wordpress-meilisearch-box">
@@ -56,6 +50,11 @@
 			do_settings_sections('wordpress_meilisearch_plugin'); ?>
 			<input name="submit" class="button button-primary" type="submit" value="<?php esc_attr_e('Save'); ?>" />
 		</form>
+	</div>
+
+	<div class="box--credit">
+		<small>This plugin is maintained by <a href="https://september.digital" target="_blank">september.digital</a>. Please file issues or requests at github.
+		</small>
 	</div>
 
 </div>

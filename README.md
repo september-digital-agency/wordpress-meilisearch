@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This is a developer friendly plugin to use Meilisearch with Wordpress. It's only purpose is to index any custom posts and to update and/or delete these based on actions in the CMS itself. It supports indexing ACF fields as well.
+Developer-friendly plugin to add Meilisearch and indexing to Wordpress. It's only purpose is to index any custom posts and to update and/or delete these based on actions in the CMS. It has basic support for indexing ACF fields as well.
 
 ## Todo before 1.0 release
 
