@@ -2,9 +2,7 @@
 
 use MeiliSearch\Client;
 
-add_action('wp_ajax_wordpress_meilisearch_debug', 'debug_meilisearch_handler');
-
-function debug_meilisearch_handler()
+function search()
 {
 	$client = new Client('http://127.0.0.1:7700', 'grantees');
 
@@ -14,3 +12,5 @@ function debug_meilisearch_handler()
 	dd($hits);
 	wp_die();
 }
+add_action('wp_ajax_search', 'search');
+add_action( 'wp_ajax_nopriv_search', 'search');

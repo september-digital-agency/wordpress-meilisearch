@@ -69,7 +69,7 @@ function wordpress_meilisearch_get_types() {
 function wordpress_meilisearch_update_post($id, WP_Post $post, $update)
 {
 
-	if (!in_array(get_post_type(), wordpress_meilisearch_get_types()) || wp_is_post_revision($id) || wp_is_post_autosave($id)) {
+	if (!in_array(get_post_type($post), wordpress_meilisearch_get_types()) || wp_is_post_revision($id) || wp_is_post_autosave($id)) {
 		return $post;
 	}
 
@@ -96,6 +96,7 @@ function wordpress_meilisearch_update_post($id, WP_Post $post, $update)
 
 	return $post;
 }
+
 add_action('save_post', 'wordpress_meilisearch_update_post', 10, 3);
 
 /**
@@ -135,6 +136,39 @@ function wordpress_meilisearch_document_from_post($post)
 
 	return $document;
 }
+
+/**
+ * wordpress_meilisearch_delete_post
+ *
+ * @param  [type]  $id
+ * @param  WP_Post $post
+ * @param  [type]  $update
+ * @return [type]
+ */
+function wordpress_meilisearch_delete_post($id, WP_Post $post)
+{
+
+	if (!in_array(get_post_type($post), wordpress_meilisearch_get_types()) || wp_is_post_revision($id) || wp_is_post_autosave($id)) {
+		return $post;
+	}
+
+	$document = wordpress_meilisearch_document_from_post($post);
+
+	if (!$document) {
+		return $post;
+	}
+
+	$client = wordpress_meilisearch_get_client();
+	if (!$client) {
+		return $post;
+	}
+
+	$index = $client->getIndex('wordpress_meilisearch_posts');
+	$index->deleteDocument($document['ID']);
+
+	return $post;
+}
+add_action('delete_post', 'wordpress_meilisearch_delete_post', 10, 3);
 
 /**
  * wordpress_meilisearch_re_index
