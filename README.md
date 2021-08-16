@@ -12,3 +12,8 @@ Developer-friendly plugin to add Meilisearch and indexing to Wordpress. It's onl
 - [ ] Add editor config, phpcs, etc
 - [ ] Feature: add option to configure what to index as a json object
 - [ ] Add simple example for frontend
+- [ ] Check against Wordpress plugin rules
+- [ ] Create usefull readme, with samples and introduction on how to run Meilisearch on production
+- [ ] Write a tutorial/blog posts
+- [ ] Work on a announcement strategy
+- [ ] Is this really open source, and how will we work on github
