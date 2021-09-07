@@ -11,6 +11,7 @@ Developer-friendly plugin to add Meilisearch and indexing to Wordpress. It's onl
 - [ ] Clean up code
 - [ ] Add build process for dist files
 - [ ] Add editor config, phpcs, etc
+- [ ] Currently, acf is indexed as a json object.. is that sufficient for using it? Or should they become their own fields in Meilisearch?
 - [ ] Feature: add option to configure what to index as a json object
 - [ ] Add simple example for frontend
 - [ ] Check against [Wordpress plugin rules](https://developer.wordpress.org/plugins/wordpress-org/planning-your-plugin/)
