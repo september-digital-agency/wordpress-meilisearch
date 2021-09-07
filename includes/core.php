@@ -10,13 +10,12 @@ use GuzzleHttp\Client as GuzzleHttpClient;
 function wordpress_meilisearch_get_client()
 {
     $options = get_option('wordpress_meilisearch_plugin_options');
-
     if (!isset($options['hostname']) || !isset($options['master_key'])) {
-        return false;
+		return false;
     }
 
-    if (empty($options['hostname']) || empty($options['master_key'])) {
-        return false;
+    if (empty($options['hostname'])) {
+		return false;
     }
 
 	try {

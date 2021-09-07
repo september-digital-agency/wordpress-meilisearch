@@ -203,12 +203,12 @@ function wordpress_meilisearch_register_settings()
 	register_setting('wordpress_meilisearch_plugin_options', 'wordpress_meilisearch_plugin_options', 'wordpress_meilisearch_plugin_options_validate');
 
 	add_settings_section('server_settings', '', 'wordpress_meilisearch_plugin_section_text', 'wordpress_meilisearch_plugin');
-	add_settings_field('wordpress_meilisearch_plugin_setting_hostname', 'Hostname', 'wordpress_meilisearch_plugin_setting_hostname', 'wordpress_meilisearch_plugin', 'server_settings');
-	add_settings_field('wordpress_meilisearch_plugin_setting_port', 'Port', 'wordpress_meilisearch_plugin_setting_port', 'wordpress_meilisearch_plugin', 'server_settings');
+	add_settings_field('wordpress_meilisearch_plugin_setting_hostname', 'Hostname*', 'wordpress_meilisearch_plugin_setting_hostname', 'wordpress_meilisearch_plugin', 'server_settings');
+	add_settings_field('wordpress_meilisearch_plugin_setting_port', 'Port*', 'wordpress_meilisearch_plugin_setting_port', 'wordpress_meilisearch_plugin', 'server_settings');
 	add_settings_field('wordpress_meilisearch_plugin_setting_master_key', 'Master Key', 'wordpress_meilisearch_plugin_setting_master_key', 'wordpress_meilisearch_plugin', 'server_settings');
 
 	add_settings_section('index_settings', '', 'wordpress_meilisearch_plugin_section_text', 'wordpress_meilisearch_plugin');
-	add_settings_field('wordpress_meilisearch_plugin_setting_index', 'Name', 'wordpress_meilisearch_plugin_setting_index', 'wordpress_meilisearch_plugin', 'index_settings');
+	add_settings_field('wordpress_meilisearch_plugin_setting_index', 'Index name*', 'wordpress_meilisearch_plugin_setting_index', 'wordpress_meilisearch_plugin', 'index_settings');
 	add_settings_field('wordpress_meilisearch_plugin_setting_types', 'Types', 'wordpress_meilisearch_plugin_setting_types', 'wordpress_meilisearch_plugin', 'index_settings');
 }
 add_action('admin_init', 'wordpress_meilisearch_register_settings');
@@ -221,13 +221,13 @@ function wordpress_meilisearch_plugin_section_text(): string
 function wordpress_meilisearch_plugin_setting_hostname()
 {
 	$options = get_option('wordpress_meilisearch_plugin_options');
-	echo '<input class="regular-text" id="wordpress_meilisearch_plugin_setting_hostname" name="wordpress_meilisearch_plugin_options[hostname]" type="text" value="' . esc_attr($options["hostname"] ?? "") . '" />';
+	echo '<input class="regular-text" id="wordpress_meilisearch_plugin_setting_hostname" name="wordpress_meilisearch_plugin_options[hostname]" type="text" value="' . esc_attr($options["hostname"] ?? "") . '" required />';
 }
 
 function wordpress_meilisearch_plugin_setting_port()
 {
 	$options = get_option('wordpress_meilisearch_plugin_options');
-	echo '<input class="regular-text" id="wordpress_meilisearch_plugin_setting_port" name="wordpress_meilisearch_plugin_options[port]" type="text" value="' . esc_attr($options["port"] ?? "") . '" />';
+	echo '<input class="regular-text" id="wordpress_meilisearch_plugin_setting_port" name="wordpress_meilisearch_plugin_options[port]" type="text" value="' . esc_attr($options["port"] ?? "") . '" required />';
 }
 
 function wordpress_meilisearch_plugin_setting_master_key()
@@ -239,7 +239,7 @@ function wordpress_meilisearch_plugin_setting_master_key()
 function wordpress_meilisearch_plugin_setting_index()
 {
 	$options = get_option('wordpress_meilisearch_plugin_options');
-	echo '<input class="regular-text" id="wordpress_meilisearch_plugin_setting_index" name="wordpress_meilisearch_plugin_options[index]" type="text" value="' . esc_attr($options["index"] ?? "") . '" />';
+	echo '<input class="regular-text" id="wordpress_meilisearch_plugin_setting_index" name="wordpress_meilisearch_plugin_options[index]" type="text" value="' . esc_attr($options["index"] ?? "") . '" required />';
 }
 
 function wordpress_meilisearch_plugin_setting_types()
