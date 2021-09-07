@@ -5,21 +5,31 @@
 Developer-friendly plugin to add Meilisearch and indexing to Wordpress. It's only purpose is to index any custom posts and to update and/or delete these based on actions in the CMS. It has basic support for indexing ACF fields as well.
 
 ## Development
-
-Symlink this repo into a Wordpress project, like:
+To symlink this repo into a Wordpress project, add the following to composer.json:
 
 ```
-{
-    "type": "path",
-    "url": "~/sites/wordpress-meilisearch",
-    "options": {
-    "symlink": true
+"repositories": [
+    {
+        "type": "path",
+        "url": "~/sites/wordpress-meilisearch",
+        "options": {
+            "symlink": true
+        }
+    }
+]
+```
+
+```
+"require": {
+    "septemberdigital/wordpress-meilisearch": "*"
 }
 ```
 
-## Install meilisearch
+and run `composer update`
 
+## Install meilisearch
 Install meilisearch, don't set a masterkey (yet) for easiest development.
+You can view the install instructions [here](https://github.com/meilisearch/MeiliSearch).
 
 ## Todo before 1.0 release
 
