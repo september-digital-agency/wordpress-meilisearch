@@ -1,5 +1,7 @@
 <?php
 
+use GuzzleHttp\Client as GuzzleHttpClient;
+
 /**
  * wordpress_meilisearch_get_client.
  *
@@ -7,25 +9,24 @@
  */
 function wordpress_meilisearch_get_client()
 {
-	$options = get_option('wordpress_meilisearch_plugin_options');
+    $options = get_option('wordpress_meilisearch_plugin_options');
 
-	if (!isset($options['hostname']) || !isset($options['master_key'])) {
-		return false;
-	}
+    if (!isset($options['hostname']) || !isset($options['master_key'])) {
+        return false;
+    }
 
-	if (empty($options['hostname']) || empty($options['master_key'])) {
-		return false;
-	}
-
-	//TODO dit werkt nog niet, gooit api exception.
+    if (empty($options['hostname']) || empty($options['master_key'])) {
+        return false;
+    }
 
 	try {
-		$client = new \MeiliSearch\Client($options['hostname'] . ':' . $options['port'], $options['master_key']);
+        $client = new \MeiliSearch\Client($options['hostname'] . ':' . $options['port'], $options['master_key'], new GuzzleHttpClient(['timeout' => 2]));
 		return $client;
-	} catch(\Exception $e) {
+	} catch (\Exception $e) {
+		return false;
 	}
-
 }
+
 
 /**
  * wordpress_meilisearch_get_index.
@@ -35,7 +36,11 @@ function wordpress_meilisearch_get_client()
  */
 function wordpress_meilisearch_get_index()
 {
-	$client = wordpress_meilisearch_get_client();
+	try {
+		$client = wordpress_meilisearch_get_client();
+	} catch (\Exception $e) {
+		return false;
+	}
 
 	if (!$client) {
 		return false;
@@ -47,7 +52,12 @@ function wordpress_meilisearch_get_index()
 		return false;
 	}
 
-	return $client->getOrCreateIndex($options['index']);
+	try {
+		return $client->getOrCreateIndex($options['index']);
+	} catch (\Exception $e) {
+		return false;
+	}
+
 }
 
 function wordpress_meilisearch_get_types() {
@@ -79,7 +89,12 @@ function wordpress_meilisearch_update_post($id, WP_Post $post, $update)
 		return $post;
 	}
 
-	$client = wordpress_meilisearch_get_client();
+	try {
+		$client = wordpress_meilisearch_get_client();
+	} catch (\Exception $e) {
+		return false;
+	}
+
 	if (!$client) {
 		return $post;
 	}
@@ -242,3 +257,16 @@ function wordpress_meilisearch_clearindex()
 	wp_redirect($_SERVER["HTTP_REFERER"], 302, 'WordPress');
 }
 add_action('admin_post_clearindex', 'wordpress_meilisearch_clearindex');
+
+function stats()
+{
+	$index = wordpress_meilisearch_get_index();
+
+	$stats = $index->stats();
+
+	wp_send_json($stats);
+	wp_die();
+
+}
+add_action('wp_ajax_stats', 'stats');
+add_action('wp_ajax_nopriv_stats', 'stats');

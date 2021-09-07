@@ -11,7 +11,7 @@
 			$stats = $index->stats();
 			$indexID = $index->getUid();
 
-			echo '<p><span class="wordpress-meilisearch-emoij">✅</span>There are ' . $stats['numberOfDocuments'] . ' documents in your index.</p>';
+			echo '<p><span class="wordpress-meilisearch-emoij">✅</span>There are <span class="wordpress-meilisearch-realtime-numberOfDocuments">' . $stats['numberOfDocuments'] . '</span> documents in your index.</p>';
 		?>
 
 			<div class="form-inline">
