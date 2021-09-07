@@ -8,14 +8,14 @@ Developer-friendly plugin to add Meilisearch and indexing to Wordpress. It's onl
 
 Symlink this repo into a Wordpress project, like:
 
-`
+```
 {
     "type": "path",
     "url": "~/sites/wordpress-meilisearch",
     "options": {
     "symlink": true
 }
-`
+```
 
 ## Install meilisearch
 
