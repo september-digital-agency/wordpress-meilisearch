@@ -1,0 +1,31 @@
+h1 > span {
+    display: block;
+    font-size: 14px;
+    color: #666;
+}
+
+.wordpress-meilisearch-box {
+    background: white;
+    padding: 20px;
+    box-shadow: 2px 2px 2px rgba(0,0,0,.10);
+}
+
+.wordpress-meilisearch-box form {
+    margin: -10px 0px 0px;
+}
+
+.wordpress-meilisearch-box p {
+    margin-top: 0;
+}
+
+.wordpress-meilisearch-box:not(:last-child) {
+    margin-bottom: 20px;
+}
+
+.wordpress-meilisearch-emoij {
+    margin-right: 10px;
+}
+
+.form-inline form {
+    display: inline-block;
+}

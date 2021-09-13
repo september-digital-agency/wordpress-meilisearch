@@ -15,7 +15,7 @@
   },
   "autoload": {
     "psr-4": {
-      "WordpressMeilisearchPlugin\\": "includes/classes/"
+      "SeptemberDigital\\Wordpress\\Meilisearch\\": "src/"
     }
   }
 }

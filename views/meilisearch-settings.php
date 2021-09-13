@@ -6,7 +6,7 @@
 	<div class="wordpress-meilisearch-box">
 		<?php
 
-		if ($index = wordpress_meilisearch_get_index()) :
+		if ($index) :
 
 			$stats = $index->stats();
 			$indexID = $index->getUid();

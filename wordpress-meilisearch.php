@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Plugin Name:       Wordpress Meilisearch
  * Plugin URI:        https://github.com/septemberdigital/wordpress-meilisearch
@@ -17,7 +16,13 @@
  * @package           WordpressMeilisearchS
  */
 
+use SeptemberDigital\Wordpress\Meilisearch\Admin;
+use SeptemberDigital\Wordpress\Meilisearch\Indexer;
+use SeptemberDigital\Wordpress\Meilisearch\Plugin;
+use SeptemberDigital\Wordpress\Meilisearch\Search;
+
 // Useful global constants.
+
 define( 'WP_MELLISEARCH_PLUGIN_VERSION', '0.1.0' );
 define( 'WP_MELLISEARCH_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'WP_MELLISEARCH_PLUGIN_PATH', plugin_dir_path( __FILE__ ) );
@@ -28,14 +33,17 @@ if ( file_exists( WP_MELLISEARCH_PLUGIN_PATH . 'vendor/autoload.php' ) ) {
 	require_once WP_MELLISEARCH_PLUGIN_PATH . 'vendor/autoload.php';
 }
 
-// Include files.
-require_once WP_MELLISEARCH_PLUGIN_INC . '/plugin.php';
-require_once WP_MELLISEARCH_PLUGIN_INC . '/core.php';
-require_once WP_MELLISEARCH_PLUGIN_INC . '/results.php';
-
 // Activation/Deactivation.
-register_activation_hook( __FILE__, '\WordpressMeilisearchPlugin\Core\activate' );
-register_deactivation_hook( __FILE__, '\WordpressMeilisearchPlugin\Core\deactivate' );
+register_activation_hook( __FILE__, [Plugin::class, 'activate']);
+register_deactivation_hook( __FILE__,  [Plugin::class, 'deactivate']);
 
 // Bootstrap.
-wordpress_meilisearch_setup();
+Plugin::setup();
+
+Indexer::init();
+
+Search::init();
+
+if(is_admin()){
+	Admin::init();
+}
