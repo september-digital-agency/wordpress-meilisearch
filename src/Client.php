@@ -13,11 +13,11 @@ class Client extends \MeiliSearch\Client
 		if (defined('MEILISEARCH_HOSTNAME') && !empty(MEILISEARCH_HOSTNAME)) {
 			$options['hostname'] = MEILISEARCH_HOSTNAME;
 		}
-		if (defined('MEILISEARCH_MASTERKEY') && !empty(MEILISEARCH_MASTERKEY)) {
-			$options['master_key'] = MEILISEARCH_MASTERKEY;
-		}
 		if (defined('MEILISEARCH_PORT') && !empty(MEILISEARCH_PORT)) {
 			$options['port'] = MEILISEARCH_PORT;
+		}
+		if (defined('MEILISEARCH_MASTERKEY') && !empty(MEILISEARCH_MASTERKEY)) {
+			$options['master_key'] = MEILISEARCH_MASTERKEY;
 		}
 
 		if (!isset($options['hostname']) || !isset($options['master_key'])) {

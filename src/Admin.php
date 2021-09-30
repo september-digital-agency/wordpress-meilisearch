@@ -60,12 +60,35 @@ class Admin
 		register_setting('wordpress_meilisearch_plugin_options', 'wordpress_meilisearch_plugin_options', 'wordpress_meilisearch_plugin_options_validate');
 
 		add_settings_section('server_settings', '', [static::class, 'sectionText'], 'wordpress_meilisearch_plugin');
-		add_settings_field('wordpress_meilisearch_plugin_setting_hostname', 'Hostname*', [static::class, 'settingHostname'], 'wordpress_meilisearch_plugin', 'server_settings');
+
+		$overriddenText = '<br> (overridden by constant)';
+
+		$hostname_settinglabel = 'Hostname*';
+		if (defined('MEILISEARCH_HOSTNAME') && !empty(MEILISEARCH_HOSTNAME)) {
+			$hostname_settinglabel .= $overriddenText;
+		}
+		add_settings_field('wordpress_meilisearch_plugin_setting_hostname', $hostname_settinglabel , [static::class, 'settingHostname'], 'wordpress_meilisearch_plugin', 'server_settings');
+
+		$port_settinglabel = 'Port*';
+		if (defined('MEILISEARCH_PORT') && !empty(MEILISEARCH_PORT)) {
+			$port_settinglabel .= $overriddenText;
+		}
 		add_settings_field('wordpress_meilisearch_plugin_setting_port', 'Port*', [static::class, 'settingPort'], 'wordpress_meilisearch_plugin', 'server_settings');
+
+		$masterkey_settinglabel = 'Master Key';
+		if (defined('MEILISEARCH_MASTERKEY') && !empty(MEILISEARCH_MASTERKEY)) {
+			$masterkey_settinglabel .= $overriddenText;
+		}
 		add_settings_field('wordpress_meilisearch_plugin_setting_master_key', 'Master Key', [static::class, 'settingMasterKey'], 'wordpress_meilisearch_plugin', 'server_settings');
 
 		add_settings_section('index_settings', '', [static::class, 'sectionText'], 'wordpress_meilisearch_plugin');
-		add_settings_field('wordpress_meilisearch_plugin_setting_index', 'Index name*', [static::class, 'settingIndex'], 'wordpress_meilisearch_plugin', 'index_settings');
+
+		$index_settinglabel = 'Index name*';
+		if (defined('MEILISEARCH_INDEX') && !empty(MEILISEARCH_INDEX)) {
+			$index_settinglabel .= $overriddenText;
+		}
+		add_settings_field('wordpress_meilisearch_plugin_setting_index', $index_settinglabel, [static::class, 'settingIndex'], 'wordpress_meilisearch_plugin', 'index_settings');
+
 		add_settings_field('wordpress_meilisearch_plugin_setting_types', 'Types', [static::class, 'settingTypes'], 'wordpress_meilisearch_plugin', 'index_settings');
 	}
 
