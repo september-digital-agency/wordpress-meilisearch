@@ -5,7 +5,7 @@
  * Description:       A developers plugin to search (custom) posts with Meilisearch.
  * Version:           0.1.0
  * Requires at least: 5.6
- * Requires PHP:      7.2
+ * Requires PHP:      7.3
  * Author:            September Digital
  * Author URI:        https://september.digital
  * License:           GPL v2 or later
