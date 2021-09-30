@@ -4,7 +4,7 @@ Donate link: https://september.digital/
 Tags: meilisearch, search, search engine
 Requires at least: 5.7
 Tested up to: 5.7
-Stable tag: 1.0
+Stable tag: 0.1.0
 Requires PHP: 7.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -14,7 +14,20 @@ Developer-friendly plugin to add Meilisearch and indexing to Wordpress. It's onl
 == Description ==
 Developer-friendly plugin to add Meilisearch and indexing to Wordpress. It's only purpose is to index any posts, custom post types and to update and/or delete these based on actions in the CMS. It also has support for post meta.
 
+Features:
+- An easy to use and setup Meilisearch integration
+- Index regular posts, pages, attachments or custom posts
+- Index any post meta
+- A lot of hooks & filters to adjust it to your needs
+- Possiblity to manually re-index
+
 The plugin will index any post type selected in the settings after you save or update it.
+
+You can override the settings by definining the following constants:
+- MEILISEARCH_HOSTNAME
+- MEILISEARCH_PORT
+- MEILISEARCH_MASTERKEY
+- MEILISEARCH_INDEX
 
 ## Install meilisearch
 1. Set up Meilisearch and run it. You can view the install instructions [here](https://github.com/meilisearch/MeiliSearch).
