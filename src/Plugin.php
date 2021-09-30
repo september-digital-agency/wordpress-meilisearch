@@ -53,7 +53,7 @@ class Plugin
 	 */
 	public static function activate() {
 		// First load the init scripts in case any rewrite functionality is being loaded
-		init();
+		self::init();
 		flush_rewrite_rules();
 	}
 
