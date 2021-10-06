@@ -56,9 +56,15 @@ class Client extends \MeiliSearch\Client
 		$client = new Client();
 
 		$indexName = $name ?? static::indexName();
-		$index = $client->getOrCreateIndex($indexName);
 
-		return $index;
+		try {
+			$index = $client->getOrCreateIndex($indexName);
+			return $index;
+		}catch(\Exception $e){
+			error_log("Error while trying to get meilisearch index instance");
+			return null;
+		}
+
 
 	}
 
