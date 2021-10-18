@@ -45,7 +45,9 @@ class Client extends \MeiliSearch\Client
 
 		if (defined('MEILISEARCH_INDEX') && !empty(MEILISEARCH_INDEX)) {
 			$options['index'] = MEILISEARCH_INDEX;
-		} else {
+		}
+
+		if (!isset($options['index'])) {
 			$options['index'] = '';
 		}
 
