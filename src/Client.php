@@ -45,6 +45,8 @@ class Client extends \MeiliSearch\Client
 
 		if (defined('MEILISEARCH_INDEX') && !empty(MEILISEARCH_INDEX)) {
 			$options['index'] = MEILISEARCH_INDEX;
+		} else {
+			$options['index'] = '';
 		}
 
 		return apply_filters('meilisearch/index_name', $options['index']);
@@ -57,15 +59,15 @@ class Client extends \MeiliSearch\Client
 
 		$indexName = $name ?? static::indexName();
 
-		try {
-			$index = $client->getOrCreateIndex($indexName);
-			return $index;
-		}catch(\Exception $e){
-			error_log("Error while trying to get meilisearch index instance");
-			return null;
+		if (!empty($indexName)) {
+			try {
+				$index = $client->getOrCreateIndex($indexName);
+				return $index;
+			}catch(\Exception $e){
+				error_log("Error while trying to get meilisearch index instance");
+				return null;
+			}
 		}
-
-
 	}
 
 }
