@@ -51,35 +51,33 @@ class Search
 	}
 
 	public static function searchHook($search, \WP_Query $query){
-
-		if(!is_admin() ) {
-
-			$search = $query->query_vars['s'];
-
-			if (empty($search)) {
-				return;
-			}
-
-			$index = Client::getIndexInstance();
-			$result = $index->search($search);
-			$hits = $result->getHits();
-
-			$ids = array_map(function($hit){
-				return $hit['ID'];
-			}, $hits);
-
-			array_unshift($ids, -1);
-			$idsString = implode(",", $ids);
-
-			$search = " AND ID IN (".$idsString.")";
-
-			add_filter('posts_search_orderby', function() use ($idsString) {
-				return 'FIELD(ID,' . $idsString.')';
-			});
-
+		if (is_admin() && !wp_doing_ajax()) {
+			return;
 		}
 
-		return $search;
+		$search = $query->query_vars['s'];
 
+		if (empty($search)) {
+			return;
+		}
+
+		$index = Client::getIndexInstance();
+		$result = $index->search($search);
+		$hits = $result->getHits();
+
+		$ids = array_map(function($hit){
+			return $hit['ID'];
+		}, $hits);
+
+		array_unshift($ids, -1);
+		$idsString = implode(",", $ids);
+
+		$search = " AND ID IN (".$idsString.")";
+
+		add_filter('posts_search_orderby', function() use ($idsString) {
+			return 'FIELD(ID,' . $idsString.')';
+		});
+
+		return $search;
 	}
 }
