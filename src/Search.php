@@ -56,6 +56,10 @@ class Search
 
 			$search = $query->query_vars['s'];
 
+			if (empty($search)) {
+				return;
+			}
+
 			$index = Client::getIndexInstance();
 			$result = $index->search($search);
 			$hits = $result->getHits();
@@ -67,7 +71,7 @@ class Search
 			array_unshift($ids, -1);
 			$idsString = implode(",", $ids);
 
-			$search = "AND ID IN (".$idsString.")";
+			$search = " AND ID IN (".$idsString.")";
 
 			add_filter('posts_search_orderby', function() use ($idsString) {
 				return 'FIELD(ID,' . $idsString.')';
