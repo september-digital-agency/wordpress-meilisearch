@@ -51,6 +51,7 @@ class Search
 	}
 
 	public static function searchHook($search, \WP_Query $query){
+
 		if (is_admin() && !wp_doing_ajax()) {
 			return;
 		}
@@ -61,7 +62,27 @@ class Search
 			return;
 		}
 
+		$post_types = (array)$query->query_vars['post_type'];
+
+		if(in_array('any', $post_types)){
+			$post_types = array_filter($post_types, function($input){
+				return $input != 'any';
+			});
+			foreach(get_post_types() as $post_type){
+				$post_types[] = $post_type;
+			}
+		}
+
+		//if there are unsupported post types queried, bail
+		if(count(array_diff($post_types, Settings::relevantPostTypes())) > 0){
+			return;
+		}
+
 		$index = Client::getIndexInstance();
+		if(!$index){
+			return;
+		}
+
 		$result = $index->search($search);
 		$hits = $result->getHits();
 
@@ -72,10 +93,10 @@ class Search
 		array_unshift($ids, -1);
 		$idsString = implode(",", $ids);
 
-		$search = " AND ID IN (".$idsString.")";
+		$search = " AND ID IN (".$idsString.") ";
 
 		add_filter('posts_search_orderby', function() use ($idsString) {
-			return 'FIELD(ID,' . $idsString.')';
+			return ' FIELD(ID,' . $idsString.') ';
 		});
 
 		return $search;
