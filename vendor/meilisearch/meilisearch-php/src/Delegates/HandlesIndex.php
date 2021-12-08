@@ -61,7 +61,7 @@ trait HandlesIndex
         try {
             $index = $this->getIndex($uid);
         } catch (ApiException $e) {
-            if (\is_array($e->httpBody) && 'index_not_found' === $e->httpBody['code']) {
+            if ($e->httpStatus == 404) {
                 $index = $this->createIndex($uid, $options);
             } else {
                 throw $e;

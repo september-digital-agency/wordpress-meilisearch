@@ -86,9 +86,13 @@ class Search
 		$result = $index->search($search);
 		$hits = $result->getHits();
 
-		$ids = array_map(function($hit){
-			return $hit['ID'];
-		}, $hits);
+		$hitLookup = array_reduce($hits, function($carry, $hit){
+			$carry[$hit['ID']] = $hit;
+			return $carry;
+		}, []);
+
+
+		$ids = array_keys($hitLookup);
 
 		array_unshift($ids, -1);
 		$idsString = implode(",", $ids);
@@ -97,6 +101,13 @@ class Search
 
 		add_filter('posts_search_orderby', function() use ($idsString) {
 			return ' FIELD(ID,' . $idsString.') ';
+		});
+
+		add_filter('posts_results', function($posts) use ( $hitLookup ) {
+			return array_map(function($post) use ( $hitLookup ) {
+				$post->meilisearch = $hitLookup[$post->ID];
+				return $post;
+			}, $posts);
 		});
 
 		return $search;
