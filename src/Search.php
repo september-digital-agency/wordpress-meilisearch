@@ -21,8 +21,8 @@ class Search
 
 		$index = Client::getIndexInstance();
 
-		$params = apply_filters('meilisearch/search_params', [], $string);
-		$options = apply_filters('meilisearch/search_options', [], $string);
+		$params = apply_filters('meilisearch/search_params', [], $string, null);
+		$options = apply_filters('meilisearch/search_options', [], $string, null);
 
 		$result = $index->search($string, $params, $options);
 		$hits = $result->getHits();
@@ -83,7 +83,10 @@ class Search
 			return;
 		}
 
-		$result = $index->search($search);
+		$params = apply_filters('meilisearch/search_params', [], $search, $query);
+		$options = apply_filters('meilisearch/search_options', [], $search, $query);
+
+		$result = $index->search($search, $params, $options);
 		$hits = $result->getHits();
 
 		$hitLookup = array_reduce($hits, function($carry, $hit){
