@@ -52,8 +52,8 @@ class Search
 
 	public static function searchHook($search, \WP_Query $query){
 
-		if (is_admin() && !wp_doing_ajax()) {
-			return;
+		if (is_admin()) {
+			return $search;
 		}
 
 		$search = $query->query_vars['s'];
