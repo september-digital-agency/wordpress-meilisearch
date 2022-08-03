@@ -4,20 +4,25 @@ declare(strict_types=1);
 
 namespace MeiliSearch\Delegates;
 
+use MeiliSearch\Contracts\IndexesQuery;
+use MeiliSearch\Contracts\IndexesResults;
 use MeiliSearch\Endpoints\Indexes;
-use MeiliSearch\Exceptions\ApiException;
 
-/**
- * @property Indexes index
- */
 trait HandlesIndex
 {
-    /**
-     * @return Indexes[]
-     */
-    public function getAllIndexes(): array
+    public function getAllIndexes(IndexesQuery $options = null): IndexesResults
     {
-        return $this->index->all();
+        return $this->index->all($options ?? null);
+    }
+
+    public function getAllRawIndexes(IndexesQuery $options = null): array
+    {
+        return $this->index->allRaw($options ?? []);
+    }
+
+    public function getRawIndex(string $uid): array
+    {
+        return $this->index($uid)->fetchRawInfo();
     }
 
     public function index(string $uid): Indexes
@@ -35,39 +40,24 @@ trait HandlesIndex
         return $this->index($uid)->delete();
     }
 
-    public function deleteAllIndexes(): void
+    public function deleteAllIndexes(): array
     {
+        $tasks = [];
         $indexes = $this->getAllIndexes();
         foreach ($indexes as $index) {
-            $index->delete();
+            $tasks[] = $index->delete();
         }
+
+        return $tasks;
     }
 
-    public function createIndex(string $uid, array $options = []): Indexes
+    public function createIndex(string $uid, array $options = []): array
     {
         return $this->index->create($uid, $options);
     }
 
-    public function updateIndex(string $uid, array $options = []): Indexes
+    public function updateIndex(string $uid, array $options = []): array
     {
         return $this->index($uid)->update($options);
-    }
-
-    /**
-     * @throws ApiException
-     */
-    public function getOrCreateIndex(string $uid, array $options = []): Indexes
-    {
-        try {
-            $index = $this->getIndex($uid);
-        } catch (ApiException $e) {
-            if ($e->httpStatus == 404) {
-                $index = $this->createIndex($uid, $options);
-            } else {
-                throw $e;
-            }
-        }
-
-        return $index;
     }
 }

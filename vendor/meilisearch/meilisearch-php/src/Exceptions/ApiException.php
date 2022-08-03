@@ -11,9 +11,9 @@ class ApiException extends Exception
 {
     public $httpStatus = 0;
     public $message = null;
-    public $errorCode = null;
-    public $errorType = null;
-    public $errorLink = null;
+    public ?string $errorCode;
+    public ?string $errorType;
+    public ?string $errorLink;
     public $httpBody = null;
 
     public function __construct(ResponseInterface $response, $httpBody, $previous = null)
@@ -30,22 +30,22 @@ class ApiException extends Exception
 
     public function __toString()
     {
-        $base = 'MeiliSearch ApiException: Http Status: '.$this->httpStatus;
+        $base = 'Meilisearch ApiException: Http Status: '.$this->httpStatus;
 
-        if ($this->message) {
+        if (!\is_null($this->message)) {
             $base .= ' - Message: '.$this->message;
         }
 
-        if ($this->errorCode) {
-            $base .= ' - Error code: '.$this->errorCode;
+        if (!\is_null($this->errorCode)) {
+            $base .= ' - Code: '.$this->errorCode;
         }
 
-        if ($this->errorType) {
-            $base .= ' - Error type: '.$this->errorType;
+        if (!\is_null($this->errorType)) {
+            $base .= ' - Type: '.$this->errorType;
         }
 
-        if ($this->errorLink) {
-            $base .= ' - Error link: '.$this->errorLink;
+        if (!\is_null($this->errorLink)) {
+            $base .= ' - Link: '.$this->errorLink;
         }
 
         return $base;
@@ -62,8 +62,8 @@ class ApiException extends Exception
 
     private function getErrorCodeFromHttpBody(): ?string
     {
-        if (\is_array($this->httpBody) && \array_key_exists('errorCode', $this->httpBody)) {
-            return $this->httpBody['errorCode'];
+        if (\is_array($this->httpBody) && \array_key_exists('code', $this->httpBody)) {
+            return $this->httpBody['code'];
         }
 
         return null;
@@ -71,8 +71,8 @@ class ApiException extends Exception
 
     private function getErrorTypeFromHttpBody(): ?string
     {
-        if (\is_array($this->httpBody) && \array_key_exists('errorType', $this->httpBody)) {
-            return $this->httpBody['errorType'];
+        if (\is_array($this->httpBody) && \array_key_exists('type', $this->httpBody)) {
+            return $this->httpBody['type'];
         }
 
         return null;
@@ -80,8 +80,8 @@ class ApiException extends Exception
 
     private function getErrorLinkFromHttpBody(): ?string
     {
-        if (\is_array($this->httpBody) && \array_key_exists('errorLink', $this->httpBody)) {
-            return $this->httpBody['errorLink'];
+        if (\is_array($this->httpBody) && \array_key_exists('link', $this->httpBody)) {
+            return $this->httpBody['link'];
         }
 
         return null;

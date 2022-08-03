@@ -4,11 +4,9 @@ declare(strict_types=1);
 
 namespace MeiliSearch\Endpoints\Delegates;
 
-use MeiliSearch\Contracts\Http;
+use MeiliSearch\Contracts\Index\Synonyms;
+use MeiliSearch\Contracts\Index\TypoTolerance;
 
-/**
- * @property Http http
- */
 trait HandlesSettings
 {
     // Settings - Ranking rules
@@ -20,7 +18,7 @@ trait HandlesSettings
 
     public function updateRankingRules(array $rankingRules): array
     {
-        return $this->http->post(self::PATH.'/'.$this->uid.'/settings/ranking-rules', $rankingRules);
+        return $this->http->put(self::PATH.'/'.$this->uid.'/settings/ranking-rules', $rankingRules);
     }
 
     public function resetRankingRules(): array
@@ -37,7 +35,7 @@ trait HandlesSettings
 
     public function updateDistinctAttribute(string $distinctAttribute): array
     {
-        return $this->http->post(self::PATH.'/'.$this->uid.'/settings/distinct-attribute', $distinctAttribute);
+        return $this->http->put(self::PATH.'/'.$this->uid.'/settings/distinct-attribute', $distinctAttribute);
     }
 
     public function resetDistinctAttribute(): array
@@ -54,7 +52,7 @@ trait HandlesSettings
 
     public function updateSearchableAttributes(array $searchableAttributes): array
     {
-        return $this->http->post(self::PATH.'/'.$this->uid.'/settings/searchable-attributes', $searchableAttributes);
+        return $this->http->put(self::PATH.'/'.$this->uid.'/settings/searchable-attributes', $searchableAttributes);
     }
 
     public function resetSearchableAttributes(): array
@@ -71,7 +69,7 @@ trait HandlesSettings
 
     public function updateDisplayedAttributes(array $displayedAttributes): array
     {
-        return $this->http->post(self::PATH.'/'.$this->uid.'/settings/displayed-attributes', $displayedAttributes);
+        return $this->http->put(self::PATH.'/'.$this->uid.'/settings/displayed-attributes', $displayedAttributes);
     }
 
     public function resetDisplayedAttributes(): array
@@ -88,7 +86,7 @@ trait HandlesSettings
 
     public function updateStopWords(array $stopWords): array
     {
-        return $this->http->post(self::PATH.'/'.$this->uid.'/settings/stop-words', $stopWords);
+        return $this->http->put(self::PATH.'/'.$this->uid.'/settings/stop-words', $stopWords);
     }
 
     public function resetStopWords(): array
@@ -100,12 +98,13 @@ trait HandlesSettings
 
     public function getSynonyms(): array
     {
-        return $this->http->get(self::PATH.'/'.$this->uid.'/settings/synonyms');
+        return (new Synonyms($this->http->get(self::PATH.'/'.$this->uid.'/settings/synonyms')))
+            ->getIterator()->getArrayCopy();
     }
 
     public function updateSynonyms(array $synonyms): array
     {
-        return $this->http->post(self::PATH.'/'.$this->uid.'/settings/synonyms', $synonyms);
+        return $this->http->put(self::PATH.'/'.$this->uid.'/settings/synonyms', new Synonyms($synonyms));
     }
 
     public function resetSynonyms(): array
@@ -113,20 +112,55 @@ trait HandlesSettings
         return $this->http->delete(self::PATH.'/'.$this->uid.'/settings/synonyms');
     }
 
-    // Settings - Attributes for faceting
+    // Settings - Filterable Attributes
 
-    public function getAttributesForFaceting(): array
+    public function getFilterableAttributes(): array
     {
-        return $this->http->get(self::PATH.'/'.$this->uid.'/settings/attributes-for-faceting');
+        return $this->http->get(self::PATH.'/'.$this->uid.'/settings/filterable-attributes');
     }
 
-    public function updateAttributesForFaceting(array $attributesForFaceting): array
+    public function updateFilterableAttributes(array $filterableAttributes): array
     {
-        return $this->http->post(self::PATH.'/'.$this->uid.'/settings/attributes-for-faceting', $attributesForFaceting);
+        return $this->http->put(self::PATH.'/'.$this->uid.'/settings/filterable-attributes', $filterableAttributes);
     }
 
-    public function resetAttributesForFaceting(): array
+    public function resetFilterableAttributes(): array
     {
-        return $this->http->delete(self::PATH.'/'.$this->uid.'/settings/attributes-for-faceting');
+        return $this->http->delete(self::PATH.'/'.$this->uid.'/settings/filterable-attributes');
+    }
+
+    // Settings - Sortable Attributes
+
+    public function getSortableAttributes(): array
+    {
+        return $this->http->get(self::PATH.'/'.$this->uid.'/settings/sortable-attributes');
+    }
+
+    public function updateSortableAttributes(array $sortableAttributes): array
+    {
+        return $this->http->put(self::PATH.'/'.$this->uid.'/settings/sortable-attributes', $sortableAttributes);
+    }
+
+    public function resetSortableAttributes(): array
+    {
+        return $this->http->delete(self::PATH.'/'.$this->uid.'/settings/sortable-attributes');
+    }
+
+    // Settings - Typo Tolerance
+
+    public function getTypoTolerance(): array
+    {
+        return (new TypoTolerance($this->http->get(self::PATH.'/'.$this->uid.'/settings/typo-tolerance')))
+            ->getIterator()->getArrayCopy();
+    }
+
+    public function updateTypoTolerance(array $typoTolerance): array
+    {
+        return $this->http->patch(self::PATH.'/'.$this->uid.'/settings/typo-tolerance', new TypoTolerance($typoTolerance));
+    }
+
+    public function resetTypoTolerance(): array
+    {
+        return $this->http->delete(self::PATH.'/'.$this->uid.'/settings/typo-tolerance');
     }
 }
