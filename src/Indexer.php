@@ -70,7 +70,7 @@ class Indexer
 	public static function onSavePost($id, WP_Post $post, $update)
 	{
 
-		if (!in_array(get_post_type($post), Settings::relevantPostTypes()) || wp_is_post_revision($id) || wp_is_post_autosave($id)) {
+		if (!in_array($post->post_type, Settings::relevantPostTypes()) || wp_is_post_revision($id) || wp_is_post_autosave($id)) {
 			return $post;
 		}
 
