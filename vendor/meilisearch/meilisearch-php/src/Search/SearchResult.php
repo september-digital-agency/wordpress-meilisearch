@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace MeiliSearch\Search;
 
-use function array_filter;
 use ArrayIterator;
 use Countable;
 use IteratorAggregate;
@@ -14,74 +13,42 @@ class SearchResult implements Countable, IteratorAggregate
     /**
      * @var array<int, array<string, mixed>>
      */
-    private $hits;
+    private array $hits;
 
     /**
-     * @var int
-     */
-    private $offset;
-
-    /**
-     * @var int
-     */
-    private $limit;
-
-    /**
-     * `nbHits` is the attributes returned by the MeiliSearch server
+     * `estimatedTotalHits` is the attributes returned by the Meilisearch server
      * and its value will not be modified by the methods in this class.
      * Please, use `hitsCount` if you want to know the real size of the `hits` array at any time.
-     *
-     * @var int
      */
-    private $nbHits;
+    private int $estimatedTotalHits;
 
-    /**
-     * @var int
-     */
-    private $hitsCount;
+    private int $hitsCount;
+    private int $offset;
+    private int $limit;
+    private int $processingTimeMs;
 
-    /**
-     * @var bool
-     */
-    private $exhaustiveNbHits;
-
-    /**
-     * @var int
-     */
-    private $processingTimeMs;
-
-    /**
-     * @var string
-     */
-    private $query;
-
-    /**
-     * @var bool|null
-     */
-    private $exhaustiveFacetsCount;
+    private string $query;
 
     /**
      * @var array<string, mixed>
      */
-    private $facetsDistribution;
+    private array $facetDistribution;
 
     /**
      * @var array<string, mixed>
      */
-    private $raw;
+    private array $raw;
 
     public function __construct(array $body)
     {
         $this->hits = $body['hits'] ?? [];
         $this->offset = $body['offset'];
         $this->limit = $body['limit'];
-        $this->nbHits = $body['nbHits'];
+        $this->estimatedTotalHits = $body['estimatedTotalHits'];
         $this->hitsCount = \count($body['hits']);
-        $this->exhaustiveNbHits = $body['exhaustiveNbHits'] ?? false;
         $this->processingTimeMs = $body['processingTimeMs'];
         $this->query = $body['query'];
-        $this->exhaustiveFacetsCount = $body['exhaustiveFacetsCount'] ?? null;
-        $this->facetsDistribution = $body['facetsDistribution'] ?? [];
+        $this->facetDistribution = $body['facetDistribution'] ?? [];
         $this->raw = $body;
     }
 
@@ -89,8 +56,7 @@ class SearchResult implements Countable, IteratorAggregate
      * Return a new {@see SearchResult} instance.
      *
      * The $options parameter is an array, and the following keys are accepted:
-     * - removeZeroFacets (boolean)
-     * - transformFacetsDistribution (callable)
+     * - transformFacetDistribution (callable)
      * - transformHits (callable)
      *
      * The method does NOT trigger a new search.
@@ -99,14 +65,11 @@ class SearchResult implements Countable, IteratorAggregate
      */
     public function applyOptions($options): self
     {
-        if (\array_key_exists('removeZeroFacets', $options) && true === $options['removeZeroFacets']) {
-            $this->removeZeroFacets();
-        }
         if (\array_key_exists('transformHits', $options) && \is_callable($options['transformHits'])) {
             $this->transformHits($options['transformHits']);
         }
-        if (\array_key_exists('transformFacetsDistribution', $options) && \is_callable($options['transformFacetsDistribution'])) {
-            $this->transformFacetsDistribution($options['transformFacetsDistribution']);
+        if (\array_key_exists('transformFacetDistribution', $options) && \is_callable($options['transformFacetDistribution'])) {
+            $this->transformFacetDistribution($options['transformFacetDistribution']);
         }
 
         return $this;
@@ -120,28 +83,11 @@ class SearchResult implements Countable, IteratorAggregate
         return $this;
     }
 
-    public function transformFacetsDistribution(callable $callback): self
+    public function transformFacetDistribution(callable $callback): self
     {
-        $this->facetsDistribution = $callback($this->facetsDistribution);
+        $this->facetDistribution = $callback($this->facetDistribution);
 
         return $this;
-    }
-
-    public function removeZeroFacets(): self
-    {
-        $filterAllFacets = function (array $facets): array {
-            $filterOneFacet = function (array $facet): array {
-                return array_filter(
-                    $facet,
-                    function (int $facetValue): bool { return 0 !== $facetValue; },
-                    ARRAY_FILTER_USE_BOTH
-                );
-            };
-
-            return array_map($filterOneFacet, $facets);
-        };
-
-        return $this->transformFacetsDistribution($filterAllFacets);
     }
 
     public function getHit(int $key, $default = null)
@@ -177,14 +123,9 @@ class SearchResult implements Countable, IteratorAggregate
         return $this->hitsCount;
     }
 
-    public function getNbHits(): int
+    public function getEstimatedTotalHits(): int
     {
-        return $this->nbHits;
-    }
-
-    public function getExhaustiveNbHits(): bool
-    {
-        return $this->exhaustiveNbHits;
+        return $this->estimatedTotalHits;
     }
 
     public function getProcessingTimeMs(): int
@@ -197,17 +138,12 @@ class SearchResult implements Countable, IteratorAggregate
         return $this->query;
     }
 
-    public function getExhaustiveFacetsCount(): ?bool
-    {
-        return $this->exhaustiveFacetsCount;
-    }
-
     /**
      * @return array<string, mixed>
      */
-    public function getFacetsDistribution(): array
+    public function getFacetDistribution(): array
     {
-        return $this->facetsDistribution;
+        return $this->facetDistribution;
     }
 
     /**
@@ -226,13 +162,11 @@ class SearchResult implements Countable, IteratorAggregate
             'hits' => $this->hits,
             'offset' => $this->offset,
             'limit' => $this->limit,
-            'nbHits' => $this->nbHits,
+            'estimatedTotalHits' => $this->estimatedTotalHits,
             'hitsCount' => $this->hitsCount,
-            'exhaustiveNbHits' => $this->exhaustiveNbHits,
             'processingTimeMs' => $this->processingTimeMs,
             'query' => $this->query,
-            'exhaustiveFacetsCount' => $this->exhaustiveFacetsCount,
-            'facetsDistribution' => $this->facetsDistribution,
+            'facetDistribution' => $this->facetDistribution,
         ];
     }
 

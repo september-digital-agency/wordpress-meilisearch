@@ -9,7 +9,11 @@ use Http\Discovery\Psr18ClientDiscovery;
 use MeiliSearch\Contracts\Http;
 use MeiliSearch\Exceptions\ApiException;
 use MeiliSearch\Exceptions\CommunicationException;
-use MeiliSearch\Exceptions\FailedJsonEncodingException;
+use MeiliSearch\Exceptions\InvalidResponseBodyException;
+use MeiliSearch\Exceptions\JsonDecodingException;
+use MeiliSearch\Exceptions\JsonEncodingException;
+use MeiliSearch\Http\Serialize\Json;
+use MeiliSearch\MeiliSearch;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Client\NetworkExceptionInterface;
@@ -20,61 +24,45 @@ use Psr\Http\Message\StreamFactoryInterface;
 
 class Client implements Http
 {
-    /**
-     * @var Http
-     */
-    private $http;
-
-    /**
-     * @var RequestFactoryInterface
-     */
-    private $requestFactory;
-
-    /**
-     * @var StreamFactoryInterface
-     */
-    private $streamFactory;
-
-    /**
-     * @var array
-     */
-    private $headers;
-
-    /**
-     * @var string
-     */
-    private $apiKey;
-
-    private $baseUrl;
+    private ClientInterface $http;
+    private RequestFactoryInterface $requestFactory;
+    private StreamFactoryInterface $streamFactory;
+    private array $headers;
+    private ?string $apiKey;
+    private string $baseUrl;
+    private Json $json;
 
     /**
      * Client constructor.
-     *
-     * @param string $apiKey
      */
-    public function __construct(string $url, string $apiKey = null, ClientInterface $httpClient = null)
-    {
+    public function __construct(
+        string $url,
+        string $apiKey = null,
+        ClientInterface $httpClient = null,
+        RequestFactoryInterface $reqFactory = null
+    ) {
         $this->baseUrl = $url;
         $this->apiKey = $apiKey;
         $this->http = $httpClient ?? Psr18ClientDiscovery::find();
-        $this->requestFactory = Psr17FactoryDiscovery::findRequestFactory();
+        $this->requestFactory = $reqFactory ?? Psr17FactoryDiscovery::findRequestFactory();
         $this->streamFactory = Psr17FactoryDiscovery::findStreamFactory();
         $this->headers = array_filter([
-            'Content-type' => 'application/json',
-            'Authorization' => 'Bearer '.$this->apiKey,
+            'User-Agent' => MeiliSearch::qualifiedVersion(),
         ]);
+        if (null != $this->apiKey) {
+            $this->headers['Authorization'] = sprintf('Bearer %s', $this->apiKey);
+        }
+        $this->json = new Json();
     }
 
     /**
-     * @param array $query
-     *
      * @return mixed
      *
      * @throws ClientExceptionInterface
      * @throws ApiException
      * @throws CommunicationException
      */
-    public function get($path, $query = [])
+    public function get(string $path, array $query = [])
     {
         $request = $this->requestFactory->createRequest(
             'GET',
@@ -92,64 +80,61 @@ class Client implements Http
      * @throws ApiException
      * @throws ClientExceptionInterface
      * @throws CommunicationException
-     * @throws FailedJsonEncodingException
+     * @throws JsonEncodingException
      */
-    public function post(string $path, $body = null, array $query = [])
+    public function post(string $path, $body = null, array $query = [], string $contentType = null)
     {
-        $content = json_encode($body);
-
-        if (false === $content) {
-            throw new FailedJsonEncodingException('Encoding payload to json failed. '.json_last_error_msg());
+        if (!\is_null($contentType)) {
+            $this->headers['Content-type'] = $contentType;
+        } else {
+            $this->headers['Content-type'] = 'application/json';
+            $body = $this->json->serialize($body);
         }
-
         $request = $this->requestFactory->createRequest(
             'POST',
             $this->baseUrl.$path.$this->buildQueryString($query)
-        )->withBody($this->streamFactory->createStream($content));
+        )->withBody($this->streamFactory->createStream($body));
 
         return $this->execute($request);
     }
 
-    public function put($path, $body = null, $query = [])
+    public function put(string $path, $body = null, array $query = [])
     {
+        $this->headers['Content-type'] = 'application/json';
         $request = $this->requestFactory->createRequest(
             'PUT',
             $this->baseUrl.$path.$this->buildQueryString($query)
-        )->withBody($this->streamFactory->createStream(json_encode($body)));
+        )->withBody($this->streamFactory->createStream($this->json->serialize($body)));
 
         return $this->execute($request);
     }
 
     /**
-     * @param string $path
-     * @param null   $body
-     * @param array  $query
+     * @param mixed|null $body
      *
      * @return mixed
      *
-     * @throws ClientExceptionInterface
      * @throws ApiException
+     * @throws JsonEncodingException
      */
-    public function patch($path, $body = null, $query = [])
+    public function patch(string $path, $body = null, array $query = [])
     {
+        $this->headers['Content-type'] = 'application/json';
         $request = $this->requestFactory->createRequest(
             'PATCH',
             $this->baseUrl.$path.$this->buildQueryString($query)
-        )->withBody($this->streamFactory->createStream(json_encode($body)));
+        )->withBody($this->streamFactory->createStream($this->json->serialize($body)));
 
         return $this->execute($request);
     }
 
     /**
-     * @param $path
-     * @param array $query
-     *
      * @return mixed
      *
      * @throws ClientExceptionInterface
      * @throws ApiException
      */
-    public function delete($path, $query = [])
+    public function delete(string $path, array $query = [])
     {
         $request = $this->requestFactory->createRequest(
             'DELETE',
@@ -165,7 +150,6 @@ class Client implements Http
      * @throws ApiException
      * @throws ClientExceptionInterface
      * @throws CommunicationException
-     * @throws ApiException
      */
     private function execute(RequestInterface $request)
     {
@@ -189,14 +173,25 @@ class Client implements Http
      * @return mixed
      *
      * @throws ApiException
+     * @throws InvalidResponseBodyException
+     * @throws JsonDecodingException
      */
     private function parseResponse(ResponseInterface $response)
     {
+        if (204 === $response->getStatusCode()) {
+            return null;
+        }
+
+        if (!\in_array('application/json', $response->getHeader('content-type'), true)) {
+            throw new InvalidResponseBodyException($response, $response->getBody()->getContents());
+        }
+
         if ($response->getStatusCode() >= 300) {
-            $body = json_decode($response->getBody()->getContents(), true) ?? $response->getReasonPhrase();
+            $body = $this->json->unserialize($response->getBody()->getContents()) ?? $response->getReasonPhrase();
+
             throw new ApiException($response, $body);
         }
 
-        return json_decode($response->getBody()->getContents(), true);
+        return $this->json->unserialize($response->getBody()->getContents());
     }
 }

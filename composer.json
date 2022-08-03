@@ -9,7 +9,7 @@
   ],
   "require": {
     "php": ">=7.0",
-    "meilisearch/meilisearch-php": "^0.18.3",
+    "meilisearch/meilisearch-php": "^0.24",
     "guzzlehttp/guzzle": "^7.3",
     "http-interop/http-factory-guzzle": "^1.0"
   },

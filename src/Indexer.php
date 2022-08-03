@@ -45,6 +45,13 @@ class Indexer
 
 		$document['meta'] = get_post_meta($post->ID, '', true);
 
+		$taxonomies = get_post_taxonomies($post->ID);
+		$terms = [];
+		foreach($taxonomies as $tax){
+			$terms[$tax] = wp_get_post_terms($post->ID, $tax);
+		}
+		$document['terms'] = $terms;
+
 		$document = apply_filters('meilisearch/parsed_document', $document, $post);
 
 		return $document;
