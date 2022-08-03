@@ -63,10 +63,19 @@ class Client extends \MeiliSearch\Client
 
 		if (!empty($indexName)) {
 			try {
-				$index = $client->getOrCreateIndex($indexName);
-				return $index;
+				$indices = $client->getAllIndexes()->getResults();
+				/** @var \MeiliSearch\Endpoints\Indexes $index */
+				foreach($indices as $index){
+					if($index->getUid() == $indexName){
+						return $index;
+					}
+				}
+				$client->createIndex($indexName);
+				//allow the index to be created
+				sleep(1);
+				return $client->getIndex($indexName);
 			}catch(\Exception $e){
-				error_log("Error while trying to get meilisearch index instance");
+				error_log("Error while trying to get meilisearch index instance: " . $e->getMessage());
 				return null;
 			}
 		}
