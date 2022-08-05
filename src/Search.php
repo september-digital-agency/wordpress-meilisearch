@@ -8,7 +8,7 @@ class Search
 		add_action('wp_ajax_search', [static::class, 'ajax']);
 		add_action('wp_ajax_nopriv_search', [static::class, 'ajax']);
 
-		add_filter('posts_search', [static::class, 'searchHook'], 10, 2);
+		add_filter('posts_search', [static::class, 'searchHook'], 1000, 2);
 
 	}
 
@@ -83,10 +83,13 @@ class Search
 			return;
 		}
 
-		$params = apply_filters('meilisearch/search_params', [], $search, $query);
+		$params = apply_filters('meilisearch/search_params', [
+			'limit' => PHP_INT_MAX
+		], $search, $query);
 		$options = apply_filters('meilisearch/search_options', [], $search, $query);
 
 		$result = $index->search($search, $params, $options);
+
 		$hits = $result->getHits();
 
 		$hitLookup = array_reduce($hits, function($carry, $hit){
@@ -97,7 +100,10 @@ class Search
 
 		$ids = array_keys($hitLookup);
 
-		array_unshift($ids, -1);
+		if(count($ids) <= 0){
+			$ids = [-1];
+		}
+
 		$idsString = implode(",", $ids);
 
 		$search = " AND ID IN (".$idsString.") ";
