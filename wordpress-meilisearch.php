@@ -23,7 +23,7 @@ use SeptemberDigital\Wordpress\Meilisearch\Search;
 
 // Useful global constants.
 
-define( 'WP_MELLISEARCH_PLUGIN_VERSION', '0.1.0' );
+define( 'WP_MELLISEARCH_PLUGIN_VERSION', '0.4.0' );
 define( 'WP_MELLISEARCH_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'WP_MELLISEARCH_PLUGIN_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WP_MELLISEARCH_PLUGIN_INC', WP_MELLISEARCH_PLUGIN_PATH . 'includes/' );

@@ -1,18 +1,30 @@
-function fetchStats() {
-	fetch("admin-ajax.php?action=stats")
-		.then((response) => response.json())
-		.then((data) => {
+const statsElm = document.querySelector('[data-meilisearch-stats-url]');
+if(statsElm){
+	const url = statsElm.getAttribute('data-meilisearch-stats-url');
 
-			const elm = document.querySelector(".wordpress-meilisearch-realtime-numberOfDocuments");
+	const interval = setInterval(function(){
 
-			if(elm){
-				elm.innerHTML = data.numberOfDocuments;
-			}
+		fetch(url, {credentials: "include"})
+			.then((response) => response.json())
+			.then((data) => {
 
-			if (data.isIndexing == true) {
-				setTimeout(fetchStats, 500);
-			}
-		});
+				const elm = document.querySelector(".wordpress-meilisearch-realtime-numberOfDocuments");
+
+				if(elm){
+					elm.innerHTML = data.index.numberOfDocuments;
+				}
+
+				const elm2 = document.querySelector(".wordpress-meilisearch-realtime-numberTotal");
+
+				if(elm2){
+					elm2.innerHTML = data.total;
+				}
+
+				if (data.index.isIndexing != true) {
+					clearInterval(interval);
+				}
+			});
+
+	}, 1000);
+
 }
-
-fetchStats();
