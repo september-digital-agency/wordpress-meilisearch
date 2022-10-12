@@ -18,8 +18,7 @@ class Plugin
 		add_filter( 'script_loader_tag', $n( 'script_loader_tag' ), 10, 2 );
 
 
-		add_action('wp_ajax_stats', $n('ajaxStats'));
-		add_action('wp_ajax_nopriv_stats', $n('ajaxStats'));
+		add_action('wp_ajax_meilisearch_stats', $n('ajaxStats'));
 
 		do_action( 'meilisearch/plugin_loaded' );
 
@@ -173,7 +172,12 @@ class Plugin
 
 		$stats = $index->stats();
 
-		wp_send_json($stats);
+
+
+		wp_send_json([
+			'index' => $stats,
+			'total' => get_option('meilisearch_total_indexed', 0)
+		]);
 		wp_die();
 	}
 

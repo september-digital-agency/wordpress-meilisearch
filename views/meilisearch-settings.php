@@ -6,13 +6,19 @@
 	<div class="wordpress-meilisearch-box">
 		<?php
 
-		if (@$index) :
+		if (@$index){
 
 			$stats = $index->stats();
 			$indexID = $index->getUid();
 
-			echo '<p><span class="wordpress-meilisearch-emoij">✅</span>There are <span class="wordpress-meilisearch-realtime-numberOfDocuments">' . $stats['numberOfDocuments'] . '</span> documents in your index.</p>';
-		?>
+			?>
+            <p>
+                <span class="wordpress-meilisearch-emoij">✅</span>
+                There are
+                <span class="wordpress-meilisearch-realtime-numberOfDocuments" data-meilisearch-stats-url="<?PHP esc_attr_e($statsUrl); ?>"><?PHP esc_attr_e($stats['numberOfDocuments']); ?></span> /
+                <span class="wordpress-meilisearch-realtime-numberTotal"><?PHP esc_attr_e(get_option('meilisearch_total_indexed')); ?></span>
+                documents in your index.
+            </p>
 
 			<div class="form-inline">
 
@@ -32,11 +38,11 @@
 
 		<?php
 
-		else :
+		}else {
 
 			echo '<p>❌	Can\'t create the MeiliSearch Client. Check your settings below.</p>';
 
-		endif;
+		}
 
 		?>
 	</div>

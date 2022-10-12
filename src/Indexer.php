@@ -133,15 +133,28 @@ class Indexer
 	{
 		$index = Client::getIndexInstance($name);
 
-		$paged = 1;
 
-		do {
+		$allPosts = get_posts([
+			'posts_per_page' => -1,
+			'post_type' => Settings::relevantPostTypes(),
+			'post_status' => 'publish',
+			'suppress_filters' => true,
+		]);
+
+		$ids = wp_list_pluck($allPosts, 'ID');
+
+		$chunks = array_chunk($ids, 50);
+
+		$totalIndexed = 0;
+
+		while($ids = array_shift($chunks)){
+
 			$posts = new WP_Query([
-				'posts_per_page' => 50,
-				'paged' => $paged,
+				'posts_per_page' => -1,
 				'post_type' => Settings::relevantPostTypes(),
 				'post_status' => 'publish',
 				'suppress_filters' => true,
+				'post__in' => $ids,
 			]);
 
 			if (!$posts->have_posts()) {
@@ -160,8 +173,11 @@ class Indexer
 
 			$result = $index->addDocuments($documents);
 
-			$paged++;
-		} while (true);
+			$totalIndexed += count($documents);
+
+		}
+
+		update_option('meilisearch_total_indexed', $totalIndexed);
 	}
 
 	public static function ajaxReindex()
@@ -181,6 +197,7 @@ class Indexer
 	public static function clear(string $name = null): bool
 	{
 		Client::getIndexInstance($name)->deleteAllDocuments();
+		update_option('meilisearch_total_indexed', 0);
 		return true;
 	}
 

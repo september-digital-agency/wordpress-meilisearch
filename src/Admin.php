@@ -150,10 +150,18 @@ class Admin
 		);
 	}
 
+	public static function ajaxActionUrl($action, $params = []){
+		$params['action'] = $action;
+		return admin_url('admin-ajax.php?'.http_build_query($params));
+	}
+
 	public static function renderSettingsPage()
 	{
 		$pluginDirPath = WP_MELLISEARCH_PLUGIN_PATH;
 		$index = Client::getIndexInstance();
+
+		$statsUrl = static::ajaxActionUrl('meilisearch_stats');
+
 		include($pluginDirPath . 'views/meilisearch-settings.php');
 	}
 
