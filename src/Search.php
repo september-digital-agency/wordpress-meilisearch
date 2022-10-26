@@ -84,7 +84,8 @@ class Search
 		}
 
 		$params = apply_filters('meilisearch/search_params', [
-			'limit' => PHP_INT_MAX
+			'limit' => PHP_INT_MAX,
+			'attributesToRetrieve' => ['ID'],
 		], $search, $query);
 		$options = apply_filters('meilisearch/search_options', [], $search, $query);
 
