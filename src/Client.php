@@ -32,7 +32,7 @@ class Client extends \MeiliSearch\Client
 
 		//TODO: Betere error handeling
 		try {
-			parent::__construct($options['hostname'] . ':' . $options['port'], $options['master_key'], new GuzzleHttpClient(['timeout' => 2]));
+			parent::__construct($options['hostname'] . ':' . $options['port'], $options['master_key'], new GuzzleHttpClient(['timeout' => apply_filters('meilisearch/client_timeout', 2)]));
 		} catch (\Exception $e) {
 			return false;
 		}
