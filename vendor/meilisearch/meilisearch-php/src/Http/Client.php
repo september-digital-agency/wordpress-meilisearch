@@ -61,7 +61,7 @@ class Client implements Http
         $this->streamFactory = Psr17FactoryDiscovery::findStreamFactory();
         $this->headers = array_filter([
             'Content-type' => 'application/json',
-            'X-Meili-API-Key' => $this->apiKey,
+            'Authorization' => 'Bearer '.$this->apiKey,
         ]);
     }
 
